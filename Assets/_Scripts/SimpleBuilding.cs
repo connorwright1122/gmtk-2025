@@ -1,3 +1,4 @@
+using Cinemachine;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,9 +10,13 @@ public class Building : MonoBehaviour, I_Damageable
     public SO_Destructable destructableStats;
     public Slider healthbar;
     public bool _inRange;
+    private CinemachineImpulseSource _impulseSource;
+
 
     private void Start()
     {
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
+        
         maxHealth = destructableStats.health;
         currentHealth = maxHealth;
         healthbar = GetComponentInChildren<Slider>();
@@ -26,6 +31,7 @@ public class Building : MonoBehaviour, I_Damageable
         currentHealth -= damage;
         //healthbar.value = currentHealth / maxHealth;
         healthbar.value = currentHealth;
+        CameraShakeManager.instance.CameraShake(_impulseSource);
         if (currentHealth <= 0)
         {
             _isDestroyed = true;
@@ -36,7 +42,8 @@ public class Building : MonoBehaviour, I_Damageable
     public void DestroySelf()
     {
         // Play destruction animation or sound here
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     public bool IsDestroyed() { return _isDestroyed; }
@@ -68,4 +75,6 @@ public class Building : MonoBehaviour, I_Damageable
     {
         return _inRange;
     }
+
+    //public bool 
 }

@@ -1,3 +1,4 @@
+using Cinemachine;
 using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ public class PlayerCombatController : MonoBehaviour
 
     public float lerpDuration = 1f;
 
+
     void Start()
     {
         _input = StarterAssetsInputs.Instance;
@@ -40,6 +42,7 @@ public class PlayerCombatController : MonoBehaviour
         _attackArea = GetComponentInChildren<AttackArea>();
         _meleeParticle = GetComponentInChildren<ParticleSystem>();
         _animator = GetComponent<Animator>();
+
     }
 
     void Update()
