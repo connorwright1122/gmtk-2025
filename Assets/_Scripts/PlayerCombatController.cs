@@ -39,6 +39,7 @@ public class PlayerCombatController : MonoBehaviour
 #endif
         _attackArea = GetComponentInChildren<AttackArea>();
         _meleeParticle = GetComponentInChildren<ParticleSystem>();
+        _animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -74,6 +75,8 @@ public class PlayerCombatController : MonoBehaviour
         }
         _timeSinceLastAttack = 0f;
         //_meleeParticle.Play();
+        //_animator.Play("PrimaryAttack");
+        _animator.SetBool("PrimaryAttack", true);
         StartCoroutine(PrimaryCooldown());
     }
 
@@ -95,6 +98,7 @@ public class PlayerCombatController : MonoBehaviour
         _isPrimaryCooldown = true;
         yield return new WaitForSeconds(_primaryCooldown);
         _isPrimaryCooldown = false;
+        _animator.SetBool("PrimaryAttack", false);
     }
 
     private void IncreaseSizeAndPower(float sizeIncreaseAmount)
