@@ -66,7 +66,7 @@ public class PlayerCombatController : MonoBehaviour
             damageable.TakeDamage(10);
             if (damageable.IsDestroyed())
             {
-                IncreaseSizeAndPower();
+                IncreaseSizeAndPower(damageable.GetSizeIncrease());
             }
             Debug.Log("Attacked");
         }
@@ -95,13 +95,14 @@ public class PlayerCombatController : MonoBehaviour
         _isPrimaryCooldown = false;
     }
 
-    private void IncreaseSizeAndPower()
+    private void IncreaseSizeAndPower(float sizeIncreaseAmount)
     {
         //transform.localScale += new Vector3(sizeIncrease, sizeIncrease, sizeIncrease);
         //transform.localScale += new Vector3(1, 1, 1);
         // Increase knockback power here (example, you can implement your own knockback logic)
         // knockbackPower += knockbackIncrease;
-        Vector3 newScale = transform.localScale + new Vector3(1, 1, 1);
+        //Vector3 newScale = transform.localScale + new Vector3(1, 1, 1);
+        Vector3 newScale = transform.localScale + new Vector3(sizeIncreaseAmount, sizeIncreaseAmount, sizeIncreaseAmount);
         StartCoroutine(LerpScale(newScale, lerpDuration));
 
     }

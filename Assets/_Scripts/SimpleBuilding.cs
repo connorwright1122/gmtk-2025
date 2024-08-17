@@ -29,4 +29,11 @@ public class Building : MonoBehaviour, I_Damageable
     }
 
     public bool IsDestroyed() { return _isDestroyed; }
+
+    public SO_Destructable GetDestructableStats() { return destructableStats; }
+
+    public float GetSizeIncrease()
+    {
+        return destructableStats.sizeIncreaseAmount;
+    }
 }
