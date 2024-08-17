@@ -67,6 +67,8 @@ public class PlayerCombatController : MonoBehaviour
             if (damageable.IsDestroyed())
             {
                 IncreaseSizeAndPower(damageable.GetSizeIncrease());
+                damageable.DestroySelf();
+                _attackArea.RemoveDamageable(damageable);
             }
             Debug.Log("Attacked");
         }

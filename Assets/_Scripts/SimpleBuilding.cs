@@ -18,14 +18,14 @@ public class Building : MonoBehaviour, I_Damageable
         if (currentHealth <= 0)
         {
             _isDestroyed = true;
-            DestroyBuilding();
+            //DestroyBuilding();
         }
     }
 
-    public void DestroyBuilding()
+    public void DestroySelf()
     {
         // Play destruction animation or sound here
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     public bool IsDestroyed() { return _isDestroyed; }

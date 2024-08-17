@@ -30,4 +30,12 @@ public class AttackArea : MonoBehaviour
     {
         return _damageablesInRange;
     }
+
+    public void RemoveDamageable(I_Damageable damageable)
+    {
+        if (damageable != null && _damageablesInRange.Contains(damageable))
+        {
+            _damageablesInRange.Remove(damageable);
+        }
+    }
 }

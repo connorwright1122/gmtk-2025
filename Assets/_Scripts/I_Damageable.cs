@@ -5,4 +5,6 @@ public interface I_Damageable
     public SO_Destructable GetDestructableStats();
 
     public float GetSizeIncrease();
+
+    public void DestroySelf();
 }
