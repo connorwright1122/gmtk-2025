@@ -12,6 +12,7 @@ public class AttackArea : MonoBehaviour
         var damageable = other.GetComponent<I_Damageable>();
         if (damageable != null)
         {
+            damageable.InRange();
             _damageablesInRange.Add(damageable);
             Debug.Log("New damageable");
         }
@@ -22,6 +23,7 @@ public class AttackArea : MonoBehaviour
         var damageable = other.GetComponent<I_Damageable>();
         if (damageable != null && _damageablesInRange.Contains(damageable))
         {
+            damageable.OutOfRange();
             _damageablesInRange.Remove(damageable);
         }
     }

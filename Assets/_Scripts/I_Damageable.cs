@@ -7,4 +7,8 @@ public interface I_Damageable
     public float GetSizeIncrease();
 
     public void DestroySelf();
+
+    public void InRange();
+    public void OutOfRange();
+    public bool IsInRange();
 }
