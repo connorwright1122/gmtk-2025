@@ -1,12 +1,15 @@
+using Cinemachine;
+using JetBrains.Annotations;
 using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.Windows;
 
 
-public class EnemyBasic : MonoBehaviour
+public class EnemyBasic : MonoBehaviour, I_Knockable
 {
     public Transform goal;
     private GameObject player;
@@ -23,11 +26,26 @@ public class EnemyBasic : MonoBehaviour
 
     private Animator _animator;
 
+    //public GameObject[]
+
+    public AttackArea attackArea;
+    public AttackArea buildingArea;
+
+    private bool _isPrimaryCooldown;
+    private float _timeSinceLastAttack;
+    public float primaryCooldown = 1f;
+
+    public GameObject nearestBuilding = null;
+    public float lerpDuration = 1f;
+
+    private CinemachineImpulseSource _impulseSource;
+
 
     private enum EnemyState 
     {
-        Walking,
-        Ragdoll
+        FindingPlayer,
+        //Ragdoll,
+        FindingBuilding,
     }
 
     void Start()
@@ -40,35 +58,44 @@ public class EnemyBasic : MonoBehaviour
         isWalking = true;
         _animator = GetComponent<Animator>();
         Debug.Log(_animator);
+        currentState = EnemyState.FindingBuilding;
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
     private void Update()
     {
-        /*
-        switch (currentState)
-        {
-            case EnemyState.Walking:
-                WalkingBehavior();
-                break;
-            case EnemyState.Ragdoll:
-                RagdollBehavior();
-                break;
-        }
-        */
+        
+        
+        
     }
 
     private void FixedUpdate()
     {
         //GetComponent<NavMeshAgent>().destination = player.transform.position;
+        /*
         if (!isBouncing)
         {
             GoToPlayer();
+        }
+        */
+        switch (currentState)
+        {
+            case EnemyState.FindingBuilding:
+                FindBuildingBehavior();
+                break;
+            case EnemyState.FindingPlayer:
+                FindPlayerBehavior();
+                break;
         }
     }
 
     private void GoToPlayer()
     {
-        agent.destination = player.transform.position;
+        if (!isBouncing)
+        {
+            agent.destination = player.transform.position;
+        }
+        
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -76,16 +103,25 @@ public class EnemyBasic : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             //float bounce = 6f; //amount of force to apply
+            /*
             agent.enabled = false;
-            rb.AddForce(collision.contacts[0].normal * bounceForce);
+            //rb.AddForce(collision.contacts[0].normal * bounceForce);
             isBouncing = true;
             Invoke("StopBounce", 1.6f);
             //Invoke("StopBounce", 1.6f);
             //_animator.Play("Stumble");
             _animator.SetBool("Stumble", true);
+            */
+            HandleKnockback(collision.contacts[0].normal * bounceForce);
             //_animator.SetBool("Stumble", false);
             //Debug.Log(;
-            collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
+
+            Vector3 knockbackDirection = -collision.contacts[0].normal;
+            knockbackDirection.y = 0; // Flatten the Y component
+
+            collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized);
+
+            //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
         }
     }
 
@@ -94,17 +130,53 @@ public class EnemyBasic : MonoBehaviour
         isBouncing = false;
         agent.enabled = true;
         _animator.SetBool("Stumble", false);
+        currentState = EnemyState.FindingPlayer;
         //_animator.Play("StandUp");
     }
 
-    private void WalkingBehavior()
+    private void FindPlayerBehavior()
     {
         GoToPlayer();
     }
 
-    private void RagdollBehavior()
-    {
+    
 
+    private void FindBuildingBehavior()
+    {
+        if (nearestBuilding == null)
+        {
+            FindNearestObject();
+        } else
+        {
+            /*
+            if (agent.remainingDistance < agent.stoppingDistance)
+            {
+                agent.updateRotation = true;
+                //insert your rotation code here
+            }
+            else
+            {
+                agent.updateRotation = true;
+            }
+            */
+            FaceTarget(nearestBuilding.transform.position);
+
+            //if close enough, attack building
+            if (attackArea.GetDamageablesObjects().Contains(nearestBuilding))
+            {
+                Debug.Log("now attack building");
+                PrimaryCheck();
+            }
+        }
+        
+    }
+
+    private void FaceTarget(Vector3 destination)
+    {
+        Vector3 lookPos = destination - transform.position;
+        lookPos.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(lookPos);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 10f);
     }
 
     public void TriggerRagdoll()
@@ -124,5 +196,147 @@ public class EnemyBasic : MonoBehaviour
             }
             */
         }
+    }
+
+    public void HandleKnockback(Vector3 direction)
+    {
+        CameraShakeManager.instance.CameraShake(_impulseSource);
+        agent.enabled = false;
+        rb.AddForce(direction);
+        isBouncing = true;
+        Invoke("StopBounce", 1.6f);
+        //Invoke("StopBounce", 1.6f);
+        //_animator.Play("Stumble");
+        _animator.SetBool("Stumble", true);
+        //_animator.SetBool("Stumble", false);
+        //Debug.Log(;
+        //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
+    }
+
+    private void FindNearestObject()
+    {
+        float distance = 0f;
+        float nearestDistance = 1000f;
+        
+        List<GameObject> buildingObjects = buildingArea.GetDamageablesObjects();
+        foreach (GameObject buildingObject in buildingObjects)
+        {
+            distance = Vector3.Distance(this.transform.position, buildingObject.transform.position);
+            if (distance < nearestDistance)
+            {
+                nearestBuilding = buildingObject;
+                nearestDistance = distance;
+            }
+        }
+
+        if (nearestBuilding != null)
+        {
+            agent.destination = nearestBuilding.transform.position;
+        } else
+        {
+            agent.destination = Vector3.zero;
+        }
+    }
+
+    private void AttackBuilding()
+    {
+        PrimaryCheck();
+    }
+
+
+
+
+
+    
+    private void PrimaryCheck()
+    {
+        if (CanAttack())
+        {
+            //if (_input.primary)
+            //{
+                Debug.Log("Attacked1");
+                Primary();
+            //}
+        }
+        //_input.primary = false;
+    }
+
+    private void Primary()
+    {
+        foreach (var damageable in attackArea.GetDamageablesInRange())
+        {
+            damageable.TakeDamage(10);
+            if (damageable.IsDestroyed())
+            {
+                IncreaseSizeAndPower(damageable.GetSizeIncrease());
+                damageable.DestroySelf();
+                attackArea.RemoveDamageable(damageable);
+                buildingArea.RemoveDamageable(damageable);
+                nearestBuilding = null;
+                Debug.Log(nearestBuilding);
+                break;
+            }
+            Debug.Log("Attacked damageable");
+        }
+        /*
+        foreach (var knockable in _attackArea.GetKnockablesInRange())
+        {
+            //knockable.TakeDamage(10);
+            knockable.HandleKnockback(knockable.gameObject.transform.forward * 1000);
+            
+            Debug.Log("Attacked knockable");
+        }
+        */
+        _timeSinceLastAttack = 0f;
+        //_meleeParticle.Play();
+        //_animator.Play("PrimaryAttack");
+        _animator.SetBool("PrimaryAttack", true);
+        StartCoroutine(PrimaryCooldown());
+    }
+
+    private bool CanAttack()
+    {
+        if (!_isPrimaryCooldown)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    private IEnumerator PrimaryCooldown()
+    {
+        _isPrimaryCooldown = true;
+        yield return new WaitForSeconds(primaryCooldown);
+        _isPrimaryCooldown = false;
+        _animator.SetBool("PrimaryAttack", false);
+    }
+
+    private void IncreaseSizeAndPower(float sizeIncreaseAmount)
+    {
+        
+        Vector3 newScale = transform.localScale + new Vector3(sizeIncreaseAmount, sizeIncreaseAmount, sizeIncreaseAmount);
+        StartCoroutine(LerpScale(newScale, lerpDuration));
+        Debug.Log("NEW SCALE ENEMY " + newScale.x);
+
+    }
+
+    private IEnumerator LerpScale(Vector3 targetScale, float duration)
+    {
+        Vector3 startScale = transform.localScale;
+        float timeElapsed = 0;
+
+        while (timeElapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(startScale, targetScale, timeElapsed / duration);
+            timeElapsed += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+
+        transform.localScale = targetScale; // Ensure the final scale is set
+
     }
 }

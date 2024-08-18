@@ -73,9 +73,19 @@ public class PlayerCombatController : MonoBehaviour
                 IncreaseSizeAndPower(damageable.GetSizeIncrease());
                 damageable.DestroySelf();
                 _attackArea.RemoveDamageable(damageable);
+                break;
             }
-            Debug.Log("Attacked");
+            Debug.Log("Attacked damageable");
         }
+        /*
+        foreach (var knockable in _attackArea.GetKnockablesInRange())
+        {
+            //knockable.TakeDamage(10);
+            knockable.HandleKnockback(knockable.gameObject.transform.forward * 1000);
+            
+            Debug.Log("Attacked knockable");
+        }
+        */
         _timeSinceLastAttack = 0f;
         //_meleeParticle.Play();
         //_animator.Play("PrimaryAttack");

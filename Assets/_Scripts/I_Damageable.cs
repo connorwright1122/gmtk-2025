@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public interface I_Damageable
 {
     public void TakeDamage(int damageAmount);
@@ -11,4 +13,5 @@ public interface I_Damageable
     public void InRange();
     public void OutOfRange();
     public bool IsInRange();
+    public GameObject GetGameObject();
 }

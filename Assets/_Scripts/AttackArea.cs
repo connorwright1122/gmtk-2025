@@ -5,6 +5,8 @@ using UnityEngine;
 public class AttackArea : MonoBehaviour
 {
     private List<I_Damageable> _damageablesInRange = new List<I_Damageable>();
+    private List<I_Knockable> _knockablesInRange = new List<I_Knockable>();
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -21,9 +23,9 @@ public class AttackArea : MonoBehaviour
         if (knockable != null)
         {
             //knockable.InRange();
-            //_damageablesInRange.Add(damageable);
+            _knockablesInRange.Add(knockable);
             //Debug.Log("New damageable");
-            knockable.HandleKnockback();
+            //knockable.HandleKnockback(-);
         }
     }
 
@@ -35,11 +37,33 @@ public class AttackArea : MonoBehaviour
             damageable.OutOfRange();
             _damageablesInRange.Remove(damageable);
         }
+
+        var knockable = other.GetComponent<I_Knockable>();
+        if (knockable != null && _knockablesInRange.Contains(knockable))
+        {
+            //damageable.OutOfRange();
+            _knockablesInRange.Remove(knockable);
+        }
     }
 
     public List<I_Damageable> GetDamageablesInRange()
     {
         return _damageablesInRange;
+    }
+
+    public List<GameObject> GetDamageablesObjects()
+    {
+        List<GameObject> list = new List<GameObject>();
+        foreach (var damageable in _damageablesInRange)
+        {
+            list.Add(damageable.GetGameObject());
+        }
+        return list;
+    }
+
+    public List<I_Knockable> GetKnockablesInRange()
+    {
+        return _knockablesInRange;
     }
 
     public void RemoveDamageable(I_Damageable damageable)

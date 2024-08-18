@@ -77,4 +77,9 @@ public class Building : MonoBehaviour, I_Damageable
     }
 
     //public bool 
+
+    public GameObject GetGameObject()
+    {
+        return this.gameObject;
+    }
 }

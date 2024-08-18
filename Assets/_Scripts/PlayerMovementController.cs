@@ -273,8 +273,11 @@ namespace StarterAssets
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                                new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            if (_controller.enabled)
+            {
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                                    new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
 
             // update animator if using character
             if (_hasAnimator)
@@ -407,13 +410,45 @@ namespace StarterAssets
             Vector3 initialPosition = transform.position;
             _animator.SetBool("Stumble", true);
 
-            while (timeElapsed < knockbackDuration)
+            float knockbackCheckDistance = .5f; // Define the distance to check for collisions
+
+            bool noWall = true;
+            int buildingLayerMask = LayerMask.GetMask("Building");
+
+            while (timeElapsed < knockbackDuration && noWall)
             {
                 // Calculate knockback movement
                 Vector3 knockbackMovement = knockbackDirection * knockbackStrength * Time.deltaTime;
+                Vector3 raycastStartPos = transform.position + Vector3.up * 1f;
+
 
                 // Apply knockback movement
+                //transform.position += knockbackMovement;
+                //_controller.Move(knockbackMovement);
+                Debug.DrawRay(raycastStartPos, knockbackDirection * knockbackCheckDistance, Color.red);
+
+                // Perform a raycast to check if there's an obstacle within the knockbackCheckDistance
+                /*
+                if (!Physics.Raycast(raycastStartPos, knockbackDirection, knockbackCheckDistance, buildingLayerMask))
+                {
+                    // Apply knockback movement if no obstacle is detected within the specified distance
+                    noWall = false;
+                    //transform.position += knockbackMovement;
+                }
                 transform.position += knockbackMovement;
+                */
+                if (Physics.Raycast(raycastStartPos, knockbackDirection, out RaycastHit hit, knockbackCheckDistance, buildingLayerMask))
+                {
+                    // Log the name of the object that the raycast hit
+                    Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+                    noWall = false;
+                }
+                else
+                {
+                    // Apply knockback movement if no obstacle is detected within the specified distance
+                    transform.position += knockbackMovement;
+                }
+
 
                 timeElapsed += Time.deltaTime;
                 yield return null; // Wait for the next frame
