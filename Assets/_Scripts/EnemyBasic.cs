@@ -40,18 +40,28 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
     private CinemachineImpulseSource _impulseSource;
 
+    private float prevSpeed;
+
+    public GameObject followThis;
+
+    public GameObject center;
+
+    private bool _hasTargetedPlayer;
+
 
     private enum EnemyState 
     {
         FindingPlayer,
         //Ragdoll,
         FindingBuilding,
+        Stumble,
     }
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
+        //followThis = player.GetComponent<FollowThis>().gameObject;
         rb = GetComponent<Rigidbody>();
         //NavMeshAgent agent = GetComponent<NavMeshAgent>();
         //agent.destination = goal.position;
@@ -60,6 +70,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         Debug.Log(_animator);
         currentState = EnemyState.FindingBuilding;
         _impulseSource = GetComponent<CinemachineImpulseSource>();
+        prevSpeed = agent.speed;
     }
 
     private void Update()
@@ -85,6 +96,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
                 break;
             case EnemyState.FindingPlayer:
                 FindPlayerBehavior();
+                break;
+            case EnemyState.Stumble:
+                StumbleBehavior();
                 break;
         }
     }
@@ -112,6 +126,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             //_animator.Play("Stumble");
             _animator.SetBool("Stumble", true);
             */
+            Debug.Log("collided with player");
             HandleKnockback(collision.contacts[0].normal * bounceForce);
             //_animator.SetBool("Stumble", false);
             //Debug.Log(;
@@ -124,6 +139,38 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
         }
     }
+
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            /*
+            Debug.Log("player collision trigger");
+            HandleKnockback(other.contacts[0].normal * bounceForce);
+            //_animator.SetBool("Stumble", false);
+            //Debug.Log(;
+
+            Vector3 knockbackDirection = -collision.contacts[0].normal;
+            knockbackDirection.y = 0; // Flatten the Y component
+
+            collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized);
+            */
+            Debug.Log("player collision trigger");
+            //agent.enabled = false;
+            //currentState = EnemyState.Stumble;
+
+            HandleKnockback(-transform.forward);
+
+            Vector3 knockbackDirection = transform.forward;
+            knockbackDirection.y = 0; // Flatten the Y component
+            other.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized);
+
+            //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized)
+            //_hasTargetedPlayer = true;
+        }
+    }
+    
 
     private void StopBounce()
     {
@@ -164,7 +211,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             //if close enough, attack building
             if (attackArea.GetDamageablesObjects().Contains(nearestBuilding))
             {
-                Debug.Log("now attack building");
+                //Debug.Log("now attack building");
                 PrimaryCheck();
             }
         }
@@ -229,12 +276,44 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             }
         }
 
+        Invoke("CheckNoTarget", .5f);
+        /*
         if (nearestBuilding != null)
         {
             agent.destination = nearestBuilding.transform.position;
         } else
         {
-            agent.destination = Vector3.zero;
+            //agent.destination = Vector3.zero;
+            //GoToPlayer();
+            //currentState = EnemyState.FindingPlayer;
+            Debug.Log("No target");
+        }
+        */
+    }
+
+    private void CheckNoTarget()
+    {
+        //return (nearestBuilding == null);
+        if (nearestBuilding != null)
+        {
+            agent.destination = nearestBuilding.transform.position;
+        }
+        else
+        {
+            /*
+            if (agent.destination != Vector3.zero)
+            {
+                agent.destination = Vector3.zero;
+            }
+            */
+            //agent.destination = Vector3.zero;
+            Debug.Log("no target");
+            agent.destination = player.transform.position;
+            //GoToPlayer();
+            //currentState = EnemyState.FindingPlayer;
+            //Debug.Log("No target");
+            //agent.destination = followThis.transform.position;
+
         }
     }
 
@@ -254,8 +333,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         {
             //if (_input.primary)
             //{
-                Debug.Log("Attacked1");
-                Primary();
+                //Debug.Log("Attacked1");
+                PrimaryOther();
+                Invoke("Primary", 1f);
             //}
         }
         //_input.primary = false;
@@ -287,7 +367,20 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             Debug.Log("Attacked knockable");
         }
         */
+        /*
         _timeSinceLastAttack = 0f;
+        //_meleeParticle.Play();
+        //_animator.Play("PrimaryAttack");
+        _animator.SetBool("PrimaryAttack", true);
+        StartCoroutine(PrimaryCooldown());
+        */
+    }
+
+    private void PrimaryOther()
+    {
+        _timeSinceLastAttack = 0f;
+        prevSpeed = agent.speed;
+        agent.speed = .1f;
         //_meleeParticle.Play();
         //_animator.Play("PrimaryAttack");
         _animator.SetBool("PrimaryAttack", true);
@@ -313,6 +406,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         yield return new WaitForSeconds(primaryCooldown);
         _isPrimaryCooldown = false;
         _animator.SetBool("PrimaryAttack", false);
+        agent.speed = prevSpeed;
     }
 
     private void IncreaseSizeAndPower(float sizeIncreaseAmount)
@@ -338,5 +432,10 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
         transform.localScale = targetScale; // Ensure the final scale is set
 
+    }
+
+    private void StumbleBehavior()
+    {
+        agent.enabled = false;
     }
 }

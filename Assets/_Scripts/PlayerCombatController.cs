@@ -57,7 +57,8 @@ public class PlayerCombatController : MonoBehaviour
             if (_input.primary)
             {
                 Debug.Log("Attacked1");
-                Primary();
+                PrimaryOther();
+                Invoke("Primary", 1f);
             }
         }
         _input.primary = false;
@@ -86,6 +87,17 @@ public class PlayerCombatController : MonoBehaviour
             Debug.Log("Attacked knockable");
         }
         */
+        /*
+        _timeSinceLastAttack = 0f;
+        //_meleeParticle.Play();
+        //_animator.Play("PrimaryAttack");
+        _animator.SetBool("PrimaryAttack", true);
+        StartCoroutine(PrimaryCooldown());
+        */
+    }
+
+    private void PrimaryOther()
+    {
         _timeSinceLastAttack = 0f;
         //_meleeParticle.Play();
         //_animator.Play("PrimaryAttack");
