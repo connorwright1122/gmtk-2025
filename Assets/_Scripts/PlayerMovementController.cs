@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -109,6 +110,10 @@ namespace StarterAssets
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
+
+        public float knockbackStrength = 5f; // Adjust the strength of the knockback
+        public float knockbackDuration = 0.2f; // Duration of the knockback
+
 
         private bool IsCurrentDeviceMouse
         {
@@ -388,5 +393,34 @@ namespace StarterAssets
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
+
+        public void Knockback(Vector3 knockbackDirection)
+        {
+            StartCoroutine(ApplyKnockback(knockbackDirection));
+        }
+
+        private IEnumerator ApplyKnockback(Vector3 knockbackDirection)
+        {
+            _controller.enabled = false;
+
+            float timeElapsed = 0f;
+            Vector3 initialPosition = transform.position;
+            _animator.SetBool("Stumble", true);
+
+            while (timeElapsed < knockbackDuration)
+            {
+                // Calculate knockback movement
+                Vector3 knockbackMovement = knockbackDirection * knockbackStrength * Time.deltaTime;
+
+                // Apply knockback movement
+                transform.position += knockbackMovement;
+
+                timeElapsed += Time.deltaTime;
+                yield return null; // Wait for the next frame
+            }
+            _animator.SetBool("Stumble", false);
+            _controller.enabled = true;
+        }
+
     }
 }

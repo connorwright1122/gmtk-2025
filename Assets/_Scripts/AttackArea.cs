@@ -16,6 +16,15 @@ public class AttackArea : MonoBehaviour
             _damageablesInRange.Add(damageable);
             Debug.Log("New damageable");
         }
+
+        var knockable = other.GetComponent<I_Knockable>();
+        if (knockable != null)
+        {
+            //knockable.InRange();
+            //_damageablesInRange.Add(damageable);
+            //Debug.Log("New damageable");
+            knockable.HandleKnockback();
+        }
     }
 
     private void OnTriggerExit(Collider other)
