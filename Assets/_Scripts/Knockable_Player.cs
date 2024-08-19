@@ -14,7 +14,7 @@ public class Knockable_Player : MonoBehaviour, I_Knockable
 
     public void HandleKnockback(Vector3 direction)
     {
-        _controller.Knockback(direction);
+        //_controller.Knockback(direction, n);
     }
 
     

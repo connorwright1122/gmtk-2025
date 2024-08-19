@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: D_Simple
   m_EditorClassIdentifier: 
   health: 20
-  sizeIncreaseAmount: 0.5
+  sizeIncreaseAmount: 2

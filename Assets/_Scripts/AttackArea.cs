@@ -73,4 +73,10 @@ public class AttackArea : MonoBehaviour
             _damageablesInRange.Remove(damageable);
         }
     }
+
+    public int GetCount()
+    {
+        return _damageablesInRange.Count; 
+    }
+
 }

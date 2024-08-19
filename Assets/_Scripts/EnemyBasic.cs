@@ -48,6 +48,8 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
     private bool _hasTargetedPlayer;
 
+    public float knockbackStrength = 1f;
+
 
     private enum EnemyState 
     {
@@ -75,7 +77,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
     private void Update()
     {
-        
+        //Debug.Log(currentState);
         
         
     }
@@ -108,6 +110,11 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         if (!isBouncing)
         {
             agent.destination = player.transform.position;
+
+            if (attackArea.GetCount() > 0)
+            {
+                PrimaryCheck();
+            }
         }
         
     }
@@ -127,14 +134,48 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             _animator.SetBool("Stumble", true);
             */
             Debug.Log("collided with player");
-            HandleKnockback(collision.contacts[0].normal * bounceForce);
-            //_animator.SetBool("Stumble", false);
-            //Debug.Log(;
+            //HandleKnockback(collision.contacts[0].normal * bounceForce);
 
-            Vector3 knockbackDirection = -collision.contacts[0].normal;
+            /*
+            Vector3 enemyBounce = collision.contacts[0].normal * collision.gameObject.transform.localScale.x / this.transform.localScale.x * bounceForce;
+            Debug.Log("enemy bounces " + enemyBounce.x);
+            HandleKnockback(enemyBounce);
+            
+            Vector3 knockbackDirection = -collision.contacts[0].normal * this.transform.localScale.x / collision.gameObject.transform.localScale.x * bounceForce;
             knockbackDirection.y = 0; // Flatten the Y component
-
+            Debug.Log("player bounces " + knockbackDirection.x);
             collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized);
+            */
+            //Vector3 enemyBounce = collision.gameObject.transform.forward * (collision.gameObject.transform.localScale.x / this.transform.localScale.x) * bounceForce;
+
+            /*
+            Vector3 enemyBounce = collision.gameObject.transform.forward * (collision.gameObject.transform.localScale.x / this.transform.localScale.x) * bounceForce;
+            this.knockbackStrength = (collision.gameObject.transform.localScale.x / this.transform.localScale.x);
+            Debug.Log("player scale " + collision.gameObject.transform.localScale.x);
+            Debug.Log("enemy bounces " + enemyBounce.x);
+            HandleKnockback(enemyBounce);
+
+            Vector3 knockbackDirection = -collision.gameObject.transform.forward * (this.transform.localScale.x / collision.gameObject.transform.localScale.x) * bounceForce;
+            knockbackDirection.y = 0; // Flatten the Y component
+            Debug.Log("player bounces " + knockbackDirection.x);
+            float newKnockbackStrength = this.transform.localScale.x / collision.gameObject.transform.localScale.x;
+            collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized, newKnockbackStrength);
+            */
+
+            Vector3 directionToPlayer = (collision.gameObject.transform.position - this.transform.position).normalized;
+            directionToPlayer.y = 0;
+
+            Vector3 enemyBounce = -directionToPlayer * (collision.gameObject.transform.localScale.x / this.transform.localScale.x) * bounceForce;
+            this.knockbackStrength = (collision.gameObject.transform.localScale.x / this.transform.localScale.x);
+            Debug.Log("player scale " + collision.gameObject.transform.localScale.x);
+            Debug.Log("enemy bounces " + enemyBounce.x);
+            HandleKnockback(enemyBounce);
+
+            Vector3 knockbackDirection = directionToPlayer * (this.transform.localScale.x / collision.gameObject.transform.localScale.x) * bounceForce;
+            knockbackDirection.y = 0; // Flatten the Y component
+            Debug.Log("player bounces " + knockbackDirection.x);
+            float newKnockbackStrength = this.transform.localScale.x / collision.gameObject.transform.localScale.x;
+            collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized, newKnockbackStrength);
 
             //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
         }
@@ -160,11 +201,42 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             //agent.enabled = false;
             //currentState = EnemyState.Stumble;
 
+            //old - good
+            /*
             HandleKnockback(-transform.forward);
 
             Vector3 knockbackDirection = transform.forward;
             knockbackDirection.y = 0; // Flatten the Y component
             other.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized);
+            */
+
+            /*
+            Vector3 enemyBounce = -transform.forward * (other.gameObject.transform.localScale.x / this.transform.localScale.x) * bounceForce;
+            this.knockbackStrength = (other.gameObject.transform.localScale.x / this.transform.localScale.x);
+            Debug.Log("enemy bounces " + enemyBounce.x);
+            HandleKnockback(enemyBounce);
+
+            Vector3 knockbackDirection = transform.forward * (this.transform.localScale.x / other.gameObject.transform.localScale.x) * bounceForce;
+            knockbackDirection.y = 0; // Flatten the Y component
+            Debug.Log("player bounces " + knockbackDirection.x);
+            float newKnockbackStrength = this.transform.localScale.x / other.gameObject.transform.localScale.x;
+
+            other.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized, newKnockbackStrength);
+            */
+            Vector3 directionToPlayer = (other.gameObject.transform.position - this.transform.position).normalized;
+            directionToPlayer.y = 0;
+
+            Vector3 enemyBounce = -directionToPlayer * (other.gameObject.transform.localScale.x / this.transform.localScale.x) * bounceForce;
+            this.knockbackStrength = (other.gameObject.transform.localScale.x / this.transform.localScale.x);
+            Debug.Log("enemy bounces " + enemyBounce.x);
+            HandleKnockback(enemyBounce);
+
+            Vector3 knockbackDirection = directionToPlayer * (this.transform.localScale.x / other.gameObject.transform.localScale.x) * bounceForce;
+            knockbackDirection.y = 0; // Flatten the Y component
+            Debug.Log("player bounces " + knockbackDirection.x);
+            float newKnockbackStrength = this.transform.localScale.x / other.gameObject.transform.localScale.x;
+
+            other.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized, newKnockbackStrength);
 
             //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(knockbackDirection.normalized)
             //_hasTargetedPlayer = true;
@@ -249,15 +321,73 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
     {
         CameraShakeManager.instance.CameraShake(_impulseSource);
         agent.enabled = false;
-        rb.AddForce(direction);
+        //rb.AddForce(direction);
+        StartCoroutine(ApplyKnockback(direction));
         isBouncing = true;
         Invoke("StopBounce", 1.6f);
-        //Invoke("StopBounce", 1.6f);
-        //_animator.Play("Stumble");
         _animator.SetBool("Stumble", true);
-        //_animator.SetBool("Stumble", false);
-        //Debug.Log(;
-        //collision.gameObject.GetComponent<PlayerMovementController>().Knockback(-collision.contacts[0].normal);
+
+        
+    }
+
+    private IEnumerator ApplyKnockback(Vector3 knockbackDirection)
+    {
+        //agent.enabled = false;
+
+        float timeElapsed = 0f;
+        Vector3 initialPosition = transform.position;
+        _animator.SetBool("Stumble", true);
+
+        float knockbackCheckDistance = .6f * this.transform.localScale.x; // Define the distance to check for collisions
+
+        bool noWall = true;
+        int buildingLayerMask = LayerMask.GetMask("Building");
+
+        //knockbackStrength *= decayFactor;
+        float decayFactor = 0.95f;
+
+        while (timeElapsed < 1.5f && noWall)
+        {
+            // Calculate knockback movement
+            Vector3 knockbackMovement = knockbackDirection * knockbackStrength * Time.deltaTime;
+            Vector3 raycastStartPos = transform.position + Vector3.up * 0f;
+            raycastStartPos.y = .02f;
+            //raycastStartPos
+            //knockbackStrength *= decayFactor;
+
+            // Apply knockback movement
+            //transform.position += knockbackMovement;
+            //_controller.Move(knockbackMovement);
+            Debug.DrawRay(raycastStartPos, knockbackDirection * knockbackCheckDistance, Color.red);
+
+            // Perform a raycast to check if there's an obstacle within the knockbackCheckDistance
+            /*
+            if (!Physics.Raycast(raycastStartPos, knockbackDirection, knockbackCheckDistance, buildingLayerMask))
+            {
+                // Apply knockback movement if no obstacle is detected within the specified distance
+                noWall = false;
+                //transform.position += knockbackMovement;
+            }
+            transform.position += knockbackMovement;
+            */
+            if (Physics.Raycast(raycastStartPos, knockbackDirection, out RaycastHit hit, knockbackCheckDistance, buildingLayerMask))
+            {
+                // Log the name of the object that the raycast hit
+                Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+                noWall = false;
+            }
+            else
+            {
+                // Apply knockback movement if no obstacle is detected within the specified distance
+                transform.position += knockbackMovement;
+            }
+
+
+            timeElapsed += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+        _animator.SetBool("Stumble", false);
+        agent.enabled = true;
     }
 
     private void FindNearestObject()
@@ -308,7 +438,10 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
             */
             //agent.destination = Vector3.zero;
             Debug.Log("no target");
-            agent.destination = player.transform.position;
+            if (!isBouncing)
+            {
+                agent.destination = player.transform.position;
+            }
             //GoToPlayer();
             //currentState = EnemyState.FindingPlayer;
             //Debug.Log("No target");

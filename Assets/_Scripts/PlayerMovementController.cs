@@ -111,7 +111,7 @@ namespace StarterAssets
 
         private bool _hasAnimator;
 
-        public float knockbackStrength = 5f; // Adjust the strength of the knockback
+        public float knockbackStrength = 1f; // Adjust the strength of the knockback
         public float knockbackDuration = 0.2f; // Duration of the knockback
 
 
@@ -161,7 +161,7 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
-            JumpAndGravity();
+            //JumpAndGravity();
             GroundedCheck();
             Move();
         }
@@ -397,8 +397,9 @@ namespace StarterAssets
             }
         }
 
-        public void Knockback(Vector3 knockbackDirection)
+        public void Knockback(Vector3 knockbackDirection, float newKnockbackStrength)
         {
+            this.knockbackStrength = newKnockbackStrength;
             StartCoroutine(ApplyKnockback(knockbackDirection));
         }
 
@@ -410,16 +411,19 @@ namespace StarterAssets
             Vector3 initialPosition = transform.position;
             _animator.SetBool("Stumble", true);
 
-            float knockbackCheckDistance = .5f; // Define the distance to check for collisions
+            float knockbackCheckDistance = .6f * this.transform.localScale.x; // Define the distance to check for collisions
 
             bool noWall = true;
             int buildingLayerMask = LayerMask.GetMask("Building");
+            float decayFactor = 0.95f;
 
             while (timeElapsed < knockbackDuration && noWall)
             {
                 // Calculate knockback movement
+                //knockbackStrength *= decayFactor;
                 Vector3 knockbackMovement = knockbackDirection * knockbackStrength * Time.deltaTime;
                 Vector3 raycastStartPos = transform.position + Vector3.up * 1f;
+                raycastStartPos.y = .02f;
 
 
                 // Apply knockback movement

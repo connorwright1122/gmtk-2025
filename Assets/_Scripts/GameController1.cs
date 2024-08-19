@@ -15,6 +15,8 @@ public class GameController1 : MonoBehaviour
     public CinemachineVirtualCamera _playerCloseUpCam;
     public CinemachineVirtualCamera _EnemyCloseUpCam;
 
+    private bool gameOver;
+
     private void Start()
     {
         slowMotionController = GetComponent<SlowMotionController>();
@@ -36,18 +38,22 @@ public class GameController1 : MonoBehaviour
 
     public void EndGame(string winner)
     {
-        if (string.Compare(winner, "Player") == 0)
-        {
-            _winText.enabled = true;
-            _winText.text = "Moneke wins!";
-            _EnemyCloseUpCam.Priority = 20;
-            slowMotionController.StartTimescaleChange();
-        } else if (string.Compare(winner, "Enemy") == 0)
-        {
-            _winText.enabled = true;
-            _winText.text = "Gocera wins!";
-            _playerCloseUpCam.Priority = 20;
-            slowMotionController.StartTimescaleChange();
+        if (!gameOver) { 
+            if (string.Compare(winner, "Player") == 0)
+            {
+                _winText.enabled = true;
+                _winText.text = "Moneke wins!";
+                _EnemyCloseUpCam.Priority = 20;
+                slowMotionController.StartTimescaleChange();
+                gameOver = true;
+            } else if (string.Compare(winner, "Enemy") == 0)
+            {
+                _winText.enabled = true;
+                _winText.text = "Gocera wins!";
+                _playerCloseUpCam.Priority = 20;
+                slowMotionController.StartTimescaleChange();
+                gameOver = true;
+            }
         }
     }
 }
