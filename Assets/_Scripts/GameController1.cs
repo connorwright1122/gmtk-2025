@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController1 : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GameController1 : MonoBehaviour
 
     public SlowMotionController slowMotionController;
     public TMP_Text _winText;
+    public GameObject _menuButton;
 
     public CinemachineVirtualCamera _playerCloseUpCam;
     public CinemachineVirtualCamera _EnemyCloseUpCam;
@@ -20,6 +22,8 @@ public class GameController1 : MonoBehaviour
     private void Start()
     {
         slowMotionController = GetComponent<SlowMotionController>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     // Start is called before the first frame update
     void Awake()
@@ -39,6 +43,8 @@ public class GameController1 : MonoBehaviour
     public void EndGame(string winner)
     {
         if (!gameOver) { 
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             if (string.Compare(winner, "Player") == 0)
             {
                 _winText.enabled = true;
@@ -46,6 +52,7 @@ public class GameController1 : MonoBehaviour
                 _EnemyCloseUpCam.Priority = 20;
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;
+                _menuButton.SetActive(true);
             } else if (string.Compare(winner, "Enemy") == 0)
             {
                 _winText.enabled = true;
@@ -53,6 +60,7 @@ public class GameController1 : MonoBehaviour
                 _playerCloseUpCam.Priority = 20;
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;
+                _menuButton.SetActive(true);
             }
         }
     }

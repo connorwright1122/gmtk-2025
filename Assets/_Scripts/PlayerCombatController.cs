@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Windows;
+using TMPro;
 
 public class PlayerCombatController : MonoBehaviour
 {
@@ -30,6 +31,11 @@ public class PlayerCombatController : MonoBehaviour
 
     public float lerpDuration = 1f;
 
+    public float maxSize = 10f;
+    private Vector3 maxSizeVector; 
+
+    public TMP_Text _sizeText;
+
 
     void Start()
     {
@@ -43,6 +49,7 @@ public class PlayerCombatController : MonoBehaviour
         _meleeParticle = GetComponentInChildren<ParticleSystem>();
         _animator = GetComponent<Animator>();
 
+        maxSizeVector = new Vector3(maxSize, maxSize, maxSize);
     }
 
     void Update()
@@ -143,15 +150,31 @@ public class PlayerCombatController : MonoBehaviour
         Vector3 startScale = transform.localScale;
         float timeElapsed = 0;
 
-        while (timeElapsed < duration)
+        while (timeElapsed < duration && transform.localScale.x < maxSize)
         {
             transform.localScale = Vector3.Lerp(startScale, targetScale, timeElapsed / duration);
             timeElapsed += Time.deltaTime;
+
+            double sizeVar = System.Math.Round(transform.localScale.x, 2) * 10;
+            _sizeText.text = sizeVar.ToString() + "M";
+
+            float newSpeed = 1f - (this.transform.localScale.x / maxSize);
+            newSpeed = Mathf.Clamp(newSpeed, .3f, 1f);
+            _animator.SetFloat("MotionSpeed2", newSpeed);
+
             yield return null; // Wait for the next frame
         }
 
         transform.localScale = targetScale; // Ensure the final scale is set
 
+        //float newSpeed = 1f - (this.transform.localScale.x * .1f);
+        float newSpeed2 = 1f - (this.transform.localScale.x / maxSize);
+        newSpeed2 = Mathf.Clamp(newSpeed2, .2f, 1f);
+        _animator.SetFloat("MotionSpeed2", newSpeed2);
+
+        double sizeVar1 = System.Math.Round(transform.localScale.x, 2) * 10;
+        _sizeText.text = sizeVar1.ToString() + "M";
+        //sizeVar1 = Mathf
     }
 
 
