@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Zone : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class Zone : MonoBehaviour
     public float _shrinkDuration;
     public float _initialSize;
     public float _finalSize;
+
+    //public TMP_Text _winText;
+
+    //public 
     
     // Start is called before the first frame update
     void Start()
@@ -49,5 +54,16 @@ public class Zone : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         Debug.Log(other.gameObject.name + " exited");
+        if (other.gameObject.CompareTag("Player"))
+        {
+            //_winText.enabled = true;
+            //_winText.text = "Moneke wins!";
+            GameController1.Instance.EndGame("Player");
+        } else if (other.gameObject.CompareTag("Enemy"))
+        {
+            //_winText.enabled = true;
+            //_winText.text = "Moneke wins!";
+            GameController1.Instance.EndGame("Enemy");
+        }
     }
 }
