@@ -12,13 +12,15 @@ public class Building : MonoBehaviour, I_Damageable
     public bool _inRange;
     private CinemachineImpulseSource _impulseSource;
     private ObjectShakeAndSink _shakeAndSink;
-
+    public AudioClip audioClip;
+    private AudioSource _audioSource;
 
     private void Start()
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         _shakeAndSink = GetComponent<ObjectShakeAndSink>();
-        
+        _audioSource = GetComponent<AudioSource>();
+
         maxHealth = destructableStats.health;
         currentHealth = maxHealth;
         healthbar = GetComponentInChildren<Slider>();
@@ -30,6 +32,9 @@ public class Building : MonoBehaviour, I_Damageable
 
     public void TakeDamage(int damage)
     {
+        //SoundFXManager.Instance.PlaySoundFXClip(audioClips[0], this.transform, 1);
+        _audioSource.clip = (audioClip);
+        _audioSource.Play();
         currentHealth -= damage;
         //healthbar.value = currentHealth / maxHealth;
         healthbar.value = currentHealth;

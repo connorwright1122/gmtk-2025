@@ -53,6 +53,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
     public float maxSize = 5f;
     private Vector3 maxSizeVector;
 
+    private AudioSource audioSource;
+    public AudioClip[] audioClips;
+
 
     private enum EnemyState 
     {
@@ -77,6 +80,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         prevSpeed = agent.speed;
         maxSizeVector = new Vector3(maxSize, maxSize, maxSize);
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -338,6 +342,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
     {
         //agent.enabled = false;
 
+        audioSource.clip = audioClips[1];
+        audioSource.Play();
+
         float timeElapsed = 0f;
         Vector3 initialPosition = transform.position;
         _animator.SetBool("Stumble", true);
@@ -577,6 +584,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
     {
         Vector3 startScale = transform.localScale;
         float timeElapsed = 0;
+
+        audioSource.clip = audioClips[0];
+        audioSource.Play();
 
         while (timeElapsed < duration && transform.localScale.x < maxSize)
         {

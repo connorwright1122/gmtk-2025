@@ -22,6 +22,8 @@ public class GameController1 : MonoBehaviour
     private GameObject player;
     private GameObject enemy;
 
+    private AudioSource audioSource;
+
     private void Start()
     {
         slowMotionController = GetComponent<SlowMotionController>();
@@ -30,6 +32,8 @@ public class GameController1 : MonoBehaviour
 
         player = GameObject.FindGameObjectWithTag("Player");
         enemy = GameObject.FindGameObjectWithTag("Enemy");
+
+        audioSource = GetComponent<AudioSource>();
     }
     // Start is called before the first frame update
     void Awake()
@@ -53,7 +57,7 @@ public class GameController1 : MonoBehaviour
             if (string.Compare(winner, "Player") == 0)
             {
                 _winText.enabled = true;
-                _winText.text = "Moneke wins!";
+                _winText.text = "Mechagoziro wins!";
                 _EnemyCloseUpCam.Priority = 20;
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;
@@ -61,7 +65,7 @@ public class GameController1 : MonoBehaviour
             } else if (string.Compare(winner, "Enemy") == 0)
             {
                 _winText.enabled = true;
-                _winText.text = "Gocera wins!";
+                _winText.text = "Goziro wins!";
                 _playerCloseUpCam.Priority = 20;
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;

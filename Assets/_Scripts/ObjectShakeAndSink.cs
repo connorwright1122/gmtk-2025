@@ -9,11 +9,14 @@ public class ObjectShakeAndSink : MonoBehaviour
 
     private Vector3 originalPosition;
     private BoxCollider boxCollider;
+    private AudioSource audioSource;
+    public AudioClip audioClip;
 
     void Start()
     {
         boxCollider = GetComponent<BoxCollider>();
         originalPosition = transform.position;
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void StartShakeAndSink()
@@ -47,6 +50,10 @@ public class ObjectShakeAndSink : MonoBehaviour
         float sinkHeight = boxCollider.size.y * transform.localScale.y; // Total height of the object
         Vector3 targetPosition = originalPosition - new Vector3(0, sinkHeight, 0);
         boxCollider.enabled = false;
+
+        audioSource.clip = audioClip;
+        audioSource.Play();
+        //SoundFXManager.Instance.PlaySoundFXClip(_audioClips[0], this.transform, 1);
 
         //elapsedTime = 0f;
 

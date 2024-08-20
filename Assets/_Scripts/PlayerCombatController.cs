@@ -36,6 +36,10 @@ public class PlayerCombatController : MonoBehaviour
 
     public TMP_Text _sizeText;
 
+    public AudioSource _audioSource;
+    
+    public CinemachineVirtualCamera _cam;
+    public float maxLens = 60f;
 
     void Start()
     {
@@ -48,6 +52,7 @@ public class PlayerCombatController : MonoBehaviour
         _attackArea = GetComponentInChildren<AttackArea>();
         _meleeParticle = GetComponentInChildren<ParticleSystem>();
         _animator = GetComponent<Animator>();
+        _audioSource = GetComponent<AudioSource>();
 
         maxSizeVector = new Vector3(maxSize, maxSize, maxSize);
     }
@@ -153,6 +158,7 @@ public class PlayerCombatController : MonoBehaviour
     {
         Vector3 startScale = transform.localScale;
         float timeElapsed = 0;
+        _audioSource.Play();
 
         while (timeElapsed < duration && transform.localScale.x < maxSize)
         {
@@ -163,8 +169,13 @@ public class PlayerCombatController : MonoBehaviour
             _sizeText.text = sizeVar.ToString() + "M";
 
             float newSpeed = 1f - (this.transform.localScale.x / maxSize);
-            newSpeed = Mathf.Clamp(newSpeed, .3f, 1f);
+            float cameraRatio = newSpeed;
+            newSpeed = Mathf.Clamp(newSpeed, .2f, 1f);
             _animator.SetFloat("MotionSpeed2", newSpeed);
+
+            cameraRatio = Mathf.Clamp(newSpeed, .4f, 1f);
+            //cameraRatio *= 
+            _cam.m_Lens.FieldOfView = Mathf.Lerp(_cam.m_Lens.FieldOfView, maxLens * cameraRatio, timeElapsed / duration);
 
             yield return null; // Wait for the next frame
         }
@@ -180,8 +191,13 @@ public class PlayerCombatController : MonoBehaviour
 
         //float newSpeed = 1f - (this.transform.localScale.x * .1f);
         float newSpeed2 = 1f - (this.transform.localScale.x / maxSize);
+        float cameraRatio2 = newSpeed2;
         newSpeed2 = Mathf.Clamp(newSpeed2, .2f, 1f);
         _animator.SetFloat("MotionSpeed2", newSpeed2);
+
+        cameraRatio2 = Mathf.Clamp(newSpeed2, .4f, 1f);
+        //cameraRatio *= 
+        _cam.m_Lens.FieldOfView = maxLens * cameraRatio2;
 
         double sizeVar1 = System.Math.Round(transform.localScale.x, 2) * 10;
         if (transform.localScale.x >= maxSize)
