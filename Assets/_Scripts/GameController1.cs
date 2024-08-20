@@ -23,6 +23,7 @@ public class GameController1 : MonoBehaviour
     private GameObject enemy;
 
     private AudioSource audioSource;
+    public AudioClip[] audioClips;
 
     private void Start()
     {
@@ -62,6 +63,8 @@ public class GameController1 : MonoBehaviour
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;
                 _menuButton.SetActive(true);
+                audioSource.clip = audioClips[0];
+                audioSource.Play();
             } else if (string.Compare(winner, "Enemy") == 0)
             {
                 _winText.enabled = true;
@@ -70,6 +73,8 @@ public class GameController1 : MonoBehaviour
                 slowMotionController.StartTimescaleChange();
                 gameOver = true;
                 _menuButton.SetActive(true);
+                audioSource.clip = audioClips[1];
+                audioSource.Play();
             }
         }
     }

@@ -169,11 +169,11 @@ public class PlayerCombatController : MonoBehaviour
             _sizeText.text = sizeVar.ToString() + "M";
 
             float newSpeed = 1f - (this.transform.localScale.x / maxSize);
-            float cameraRatio = newSpeed;
+            float cameraRatio = (this.transform.localScale.x / maxSize);
             newSpeed = Mathf.Clamp(newSpeed, .2f, 1f);
             _animator.SetFloat("MotionSpeed2", newSpeed);
 
-            cameraRatio = Mathf.Clamp(newSpeed, .4f, 1f);
+            cameraRatio = Mathf.Clamp(cameraRatio, .4f, 1f);
             //cameraRatio *= 
             _cam.m_Lens.FieldOfView = Mathf.Lerp(_cam.m_Lens.FieldOfView, maxLens * cameraRatio, timeElapsed / duration);
 
@@ -191,13 +191,14 @@ public class PlayerCombatController : MonoBehaviour
 
         //float newSpeed = 1f - (this.transform.localScale.x * .1f);
         float newSpeed2 = 1f - (this.transform.localScale.x / maxSize);
-        float cameraRatio2 = newSpeed2;
+        float cameraRatio2 = (this.transform.localScale.x / maxSize);
         newSpeed2 = Mathf.Clamp(newSpeed2, .2f, 1f);
         _animator.SetFloat("MotionSpeed2", newSpeed2);
 
-        cameraRatio2 = Mathf.Clamp(newSpeed2, .4f, 1f);
+        cameraRatio2 = Mathf.Clamp(cameraRatio2, .4f, 1f);
         //cameraRatio *= 
-        _cam.m_Lens.FieldOfView = maxLens * cameraRatio2;
+        //_cam.m_Lens.FieldOfView = maxLens * cameraRatio2;
+        _cam.m_Lens.FieldOfView = Mathf.Lerp(_cam.m_Lens.FieldOfView, maxLens * cameraRatio2, 1f);
 
         double sizeVar1 = System.Math.Round(transform.localScale.x, 2) * 10;
         if (transform.localScale.x >= maxSize)
