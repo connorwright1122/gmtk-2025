@@ -73,7 +73,11 @@ public class PlayerCombatController : MonoBehaviour
 
     private void Primary()
     {
-        foreach (var damageable in _attackArea.GetDamageablesInRange())
+        List<I_Damageable> originalList = _attackArea.GetDamageablesInRange();
+        List<I_Damageable> deepCopiedList = new List<I_Damageable>(originalList);
+
+
+        foreach (var damageable in deepCopiedList)
         {
             damageable.TakeDamage(10);
             if (damageable.IsDestroyed())
@@ -165,7 +169,14 @@ public class PlayerCombatController : MonoBehaviour
             yield return null; // Wait for the next frame
         }
 
-        transform.localScale = targetScale; // Ensure the final scale is set
+        if (targetScale.x < maxSize)
+        {
+            transform.localScale = targetScale; // Ensure the final scale is set
+        }
+        else
+        {
+            transform.localScale = maxSizeVector;
+        }
 
         //float newSpeed = 1f - (this.transform.localScale.x * .1f);
         float newSpeed2 = 1f - (this.transform.localScale.x / maxSize);
@@ -173,7 +184,14 @@ public class PlayerCombatController : MonoBehaviour
         _animator.SetFloat("MotionSpeed2", newSpeed2);
 
         double sizeVar1 = System.Math.Round(transform.localScale.x, 2) * 10;
-        _sizeText.text = sizeVar1.ToString() + "M";
+        if (transform.localScale.x >= maxSize)
+        {
+            _sizeText.text = sizeVar1.ToString() + "M - MAX!";
+        } else
+        {
+            _sizeText.text = sizeVar1.ToString() + "M";
+        }
+        
         //sizeVar1 = Mathf
     }
 

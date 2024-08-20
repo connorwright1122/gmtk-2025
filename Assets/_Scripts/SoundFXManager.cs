@@ -14,6 +14,10 @@ public class SoundFXManager : MonoBehaviour
     //public AudioClip[] musicClips;
     public AudioClip[] soundFXClips;
 
+    public AudioSource musicSource;
+    public float duration = 2f; // Duration over which to fade out the volume
+
+
     // Public property to access the instance
     public static SoundFXManager Instance
     {
@@ -73,6 +77,29 @@ public class SoundFXManager : MonoBehaviour
         float clipLength = audioSource.clip.length;
         Destroy(audioSource.gameObject, clipLength);
     }
+
+
+    public void StartFadeOut()
+    {
+        StartCoroutine(FadeOutVolume());
+    }
+
+    private IEnumerator FadeOutVolume()
+    {
+        float startVolume = musicSource.volume;
+        float timeElapsed = 0f;
+
+        while (timeElapsed < duration)
+        {
+            timeElapsed += Time.deltaTime;
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, timeElapsed / duration);
+            yield return null;
+        }
+
+        // Ensure the volume is set to 0 at the end
+        musicSource.volume = 0f;
+    }
+
 
 }
 

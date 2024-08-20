@@ -19,11 +19,17 @@ public class GameController1 : MonoBehaviour
 
     private bool gameOver;
 
+    private GameObject player;
+    private GameObject enemy;
+
     private void Start()
     {
         slowMotionController = GetComponent<SlowMotionController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        player = GameObject.FindGameObjectWithTag("Player");
+        enemy = GameObject.FindGameObjectWithTag("Enemy");
     }
     // Start is called before the first frame update
     void Awake()
@@ -37,13 +43,12 @@ public class GameController1 : MonoBehaviour
             Instance = this;
         }
 
-
     }
 
     public void EndGame(string winner)
     {
         if (!gameOver) { 
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             if (string.Compare(winner, "Player") == 0)
             {

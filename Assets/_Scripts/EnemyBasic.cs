@@ -50,6 +50,9 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
     public float knockbackStrength = 1f;
 
+    public float maxSize = 5f;
+    private Vector3 maxSizeVector;
+
 
     private enum EnemyState 
     {
@@ -73,6 +76,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
         currentState = EnemyState.FindingBuilding;
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         prevSpeed = agent.speed;
+        maxSizeVector = new Vector3(maxSize, maxSize, maxSize);
     }
 
     private void Update()
@@ -551,6 +555,7 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
     }
 
+    /*
     private IEnumerator LerpScale(Vector3 targetScale, float duration)
     {
         Vector3 startScale = transform.localScale;
@@ -565,6 +570,41 @@ public class EnemyBasic : MonoBehaviour, I_Knockable
 
         transform.localScale = targetScale; // Ensure the final scale is set
 
+    }
+    */
+
+    private IEnumerator LerpScale(Vector3 targetScale, float duration)
+    {
+        Vector3 startScale = transform.localScale;
+        float timeElapsed = 0;
+
+        while (timeElapsed < duration && transform.localScale.x < maxSize)
+        {
+            transform.localScale = Vector3.Lerp(startScale, targetScale, timeElapsed / duration);
+            timeElapsed += Time.deltaTime;
+
+            float newSpeed = 1f - (this.transform.localScale.x / maxSize);
+            newSpeed = Mathf.Clamp(newSpeed, .3f, 1f);
+            _animator.SetFloat("MotionSpeed2", newSpeed);
+
+            yield return null; // Wait for the next frame
+        }
+
+        if (targetScale.x < maxSize)
+        {
+            transform.localScale = targetScale; // Ensure the final scale is set
+        } else
+        {
+            transform.localScale = maxSizeVector;
+        }
+
+        //float newSpeed = 1f - (this.transform.localScale.x * .1f);
+        float newSpeed2 = 1f - (this.transform.localScale.x / maxSize);
+        newSpeed2 = Mathf.Clamp(newSpeed2, .2f, 1f);
+        _animator.SetFloat("MotionSpeed2", newSpeed2);
+
+        
+        //sizeVar1 = Mathf
     }
 
     private void StumbleBehavior()

@@ -11,11 +11,13 @@ public class Building : MonoBehaviour, I_Damageable
     public Slider healthbar;
     public bool _inRange;
     private CinemachineImpulseSource _impulseSource;
+    private ObjectShakeAndSink _shakeAndSink;
 
 
     private void Start()
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
+        _shakeAndSink = GetComponent<ObjectShakeAndSink>();
         
         maxHealth = destructableStats.health;
         currentHealth = maxHealth;
@@ -43,7 +45,8 @@ public class Building : MonoBehaviour, I_Damageable
     {
         // Play destruction animation or sound here
         //Destroy(gameObject);
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
+        _shakeAndSink.StartShakeAndSink();
     }
 
     public bool IsDestroyed() { return _isDestroyed; }
